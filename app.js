@@ -20,8 +20,10 @@ app.use((req, res, next) => {
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
-app.use(() => {
-  throw new Error('Ошибочка ебать копать');
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Веб-страница ищет HTML своей жизни. Желательно без ошибок и вредных привычек :)',
+  });
 });
 
 app.listen(PORT, () => {
