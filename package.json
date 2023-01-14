@@ -1,0 +1,23 @@
+{
+  "name": "dev",
+  "description": "Бэкенд проекта Место. Учебный проект Яндекс.Практикума",
+  "keywords": [
+    "yandex-praktikum"
+  ],
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "eslint": "^8.25.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "express": "^4.18.2",
+    "mongoose": "^6.6.5",
+    "nodemon": "^2.0.20",
+    "validator": "^13.7.0"
+  },
+  "scripts": {
+    "lint": "npx eslint .",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "author": "Vyacheslav Kostolomov"
+}
