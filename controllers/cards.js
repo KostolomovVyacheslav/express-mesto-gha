@@ -18,7 +18,7 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ messgae: 'Переданы некорректные данные при создании карточки', err });
+        return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки', err });
       }
       return res.status(500).send({ message: 'На сервере произошла ошибка', err });
     });
@@ -26,16 +26,18 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findById(cardId).orFail(new Error('Not Found'));
-  Card.deleteOne({ _id: cardId })
+  Card.findById({ _id: cardId })
 
     .then((deletedCard) => {
-      res.status(200).send(deletedCard);
+      if (!deletedCard) {
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      }
+      Card.deleteOne({ _id: cardId })
+        .then((card) => {
+          res.status(200).send(card);
+        });
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
-        return res.status(404).send({ message: 'Карточка с указанным _id не найдена', err });
-      }
       if (err instanceof mongoose.Error.CastError) {
         return res.status(400).send({ message: 'Не корректный _id', err });
       }

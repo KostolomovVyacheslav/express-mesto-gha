@@ -20,6 +20,10 @@ app.use((req, res, next) => {
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
+app.use(() => {
+  throw new Error('Ошибочка ебать копать');
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
