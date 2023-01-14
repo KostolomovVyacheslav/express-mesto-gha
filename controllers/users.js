@@ -14,6 +14,7 @@ const getUsers = (req, res) => {
 const getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId).orFail(new Error('Not Found'))
+
     .then((user) => {
       res.status(200).send(user);
     })
@@ -30,6 +31,7 @@ const getUserById = (req, res) => {
 
 const createUser = (req, res) => {
   User.create(req.body)
+
     .then((user) => {
       res.status(201).send(user);
     })
@@ -48,6 +50,7 @@ const profileUpdate = (req, res) => {
     { name, about },
     { new: true, runValidators: true },
   ).orFail(new Error('Not Found'))
+
     .then((user) => {
       res.status(200).send(user);
     })
