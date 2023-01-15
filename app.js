@@ -10,8 +10,8 @@ mongoose.connect(MONGO_URL);
 const app = express();
 
 const limiter = rateLimit({
-  windowMs: 1000,
-  max: 1,
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Слишком много запросов, пожалуйста попробуйте позже :)',
 });
 
