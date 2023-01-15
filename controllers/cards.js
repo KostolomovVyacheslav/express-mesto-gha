@@ -26,18 +26,18 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findById({ _id: cardId })
+  Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
 
-    .then((deletedCard) => {
-      if (!deletedCard) {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-      }
+    .then(() => {
       Card.deleteOne({ _id: cardId })
-        .then((card) => {
-          res.status(200).send(card);
+        .then((deletedCard) => {
+          res.status(200).send(deletedCard);
         });
     })
     .catch((err) => {
+      if (err.message === 'Not Found') {
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      }
       if (err instanceof mongoose.Error.CastError) {
         return res.status(400).send({ message: 'Не корректный _id', err });
       }
