@@ -10,11 +10,12 @@ mongoose.connect(MONGO_URL);
 const app = express();
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 1000,
+  max: 1,
   message: 'Слишком много запросов, пожалуйста попробуйте позже :)',
 });
 
+app.use(limiter);
 app.use(helmet());
 
 app.use(express.json());
@@ -27,10 +28,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/cards', limiter, require('./routes/cards'));
-app.use('/users', limiter, require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
+app.use('/users', require('./routes/users'));
 
-app.use(limiter, (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     message: 'Веб-страница ищет HTML своей жизни. Желательно без ошибок и вредных привычек :)',
   });
