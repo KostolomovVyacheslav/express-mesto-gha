@@ -29,6 +29,9 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
+  if (!cardId) {
+    res.status(403).send({ message: 'Не правильный id' });
+  }
   const owner = req.user._id;
   Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
     .then((card) => {
