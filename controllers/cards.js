@@ -32,7 +32,7 @@ const deleteCard = (req, res) => {
   const owner = req.user._id;
   Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
     .then((card) => {
-      if (owner === card.owner.toString()) {
+      if (owner !== card.owner.toString()) {
         res.status(403).send({ message: 'Вы не владелец карточки' });
       }
       Card.deleteOne({ _id: cardId })
