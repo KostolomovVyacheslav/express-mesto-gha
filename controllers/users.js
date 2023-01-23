@@ -34,7 +34,7 @@ const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail(() => {
-      throw new NotFoundError('Пользователь по указанному id не найдет, такие дела делишки');
+      throw new NotFoundError('Пользователь по указанному id не найден, такие дела делишки');
     })
 
     .then((user) => {
@@ -45,7 +45,7 @@ const getUserById = (req, res, next) => {
       if (err.message === 'CastError') {
         throw new BadRequest('Переданы некорректные данные');
       } else if (err.message === 'Not Found') {
-        throw new NotFoundError('Пользователь по указанному id не найдет, такие дела делишки');
+        throw new NotFoundError('Пользователь по указанному id не найден, такие дела делишки');
       } else {
         next(err);
       }

@@ -27,31 +27,47 @@ const createCard = (req, res) => {
     });
 };
 
+// const deleteCard = (req, res) => {
+//   const { cardId } = req.params;
+//   if (!cardId) {
+//     res.status(403).send({ message: 'Не правильный id' });
+//   }
+//   const owner = req.user._id;
+//   Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
+//     .then((card) => {
+//       if (owner !== card.owner.toString()) {
+//         res.status(403).send({ message: 'Вы не владелец карточки' });
+//       }
+//       Card.deleteOne({ _id: cardId })
+//       // res.status(200).send(`${owner} ${card.owner}`);
+//         .then((deletedCard) => {
+//           res.status(200).send(deletedCard);
+//         });
+//     })
+//     .catch((err) => {
+//       if (err.message === 'Not Found') {
+//         return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+//       }
+//       if (err instanceof mongoose.Error.CastError) {
+//         return res.status(400).send({ message: 'Не корректный _id', err });
+//       }
+//       return res.status(500).send({ message: 'На сервере произошла ошибка', err });
+//     });
+// };
+
 const deleteCard = (req, res) => {
-  const { cardId } = req.params;
-  if (!cardId) {
-    res.status(403).send({ message: 'Не правильный id' });
-  }
-  const owner = req.user._id;
-  Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
-    .then((card) => {
-      if (owner !== card.owner.toString()) {
-        res.status(403).send({ message: 'Вы не владелец карточки' });
-      }
-      Card.deleteOne({ _id: cardId })
-      // res.status(200).send(`${owner} ${card.owner}`);
-        .then((deletedCard) => {
-          res.status(200).send(deletedCard);
-        });
+  const cardId = req.params.id;
+
+  return Card.findById(cardId)
+    .orFail(() => {
+      res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
     })
-    .catch((err) => {
-      if (err.message === 'Not Found') {
-        return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+    .then((card) => {
+      if (card.owner.toString() === req.user._id) {
+        Card.findByIdAndRemove(cardId)
+          .then(() => res.status(200).send(card));
       }
-      if (err instanceof mongoose.Error.CastError) {
-        return res.status(400).send({ message: 'Не корректный _id', err });
-      }
-      return res.status(500).send({ message: 'На сервере произошла ошибка', err });
+      res.status(403).send({ message: 'Вы не владелец карточки' });
     });
 };
 
