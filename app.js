@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-// const helmet = require('helmet');
+const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 // const { celebrate, Joi } = require('celebrate');
@@ -20,20 +20,9 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-// app.use(helmet());
+app.use(helmet());
 
 app.use(express.json());
-
-// ЭТО ХАРДКОД АЙДИ ЮЗЕРА
-// ЭТО НУЖНО БУДЕТ УДАЛИТЬ, НО ПОКА ЧТО В КОММЕНТАРИИ
-
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '63c2e86086069ad64d047054',
-//   };
-
-//   next();
-// });
 
 app.post('/signup', createUser);
 app.post('/signin', login);

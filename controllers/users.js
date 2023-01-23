@@ -42,15 +42,24 @@ const getUserById = (req, res, next) => {
 };
 
 const getSelfInfo = (req, res) => {
-  console.log(req.user._id);
-  const { userId } = req.params;
-  User.findById(userId)
+  // const userId = req.user._id;
+  // console.log(req.params);
+  User.findById(req.user._id)
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ user });
     })
     .catch((err) => {
-      res.status(404).send({ message: 'ошибка в поиске', err });
+      res.status(500).send({ message: 'ошибка ошибка', err });
     });
+  // console.log(req.user._id);
+  // const { userId } = req.params;
+  // User.findById(userId)
+  //   .then((user) => {
+  //     res.status(200).send(user);
+  //   })
+  //   .catch((err) => {
+  //     res.status(404).send({ message: 'ошибка в поиске', err });
+  //   });
 };
 
 // const getUserById = (req, res) => {
