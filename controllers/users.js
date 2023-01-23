@@ -170,7 +170,7 @@ const login = (req, res) => {
       // res.status(200).send(user);
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret',
+        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
         { expiresIn: '7d' },
       );
       // const token = jwt.sign({ _id: user._id }, 'some-secret-key');КК
