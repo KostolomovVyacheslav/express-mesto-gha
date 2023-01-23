@@ -174,12 +174,12 @@ const login = (req, res) => {
         { expiresIn: '7d' },
       );
       // const token = jwt.sign({ _id: user._id }, 'some-secret-key');КК
-      // res.send({ token });
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        sameSite: true,
-        maxAge: 3600000 * 24,
-      }).send({ token });
+      res.send({ token });
+      // res.cookie('jwt', token, {
+      //   httpOnly: true,
+      //   sameSite: true,
+      //   maxAge: 3600000 * 24,
+      // }).send({ token });
     })
     .catch((err) => {
       res
