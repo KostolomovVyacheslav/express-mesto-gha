@@ -6,9 +6,6 @@ const {
 router.get('/', getUsers);
 
 router.get('/me', getSelfInfo);
-// router.get('/me', (req, res) => {
-//   console.log(req.user);
-// });
 
 router.get('/:userId', getUserById);
 

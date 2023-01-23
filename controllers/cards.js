@@ -12,7 +12,10 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  Card.create(req.body)
+  const { name, link } = req.body;
+  const owner = req.user._id;
+
+  Card.create({ name, link, owner })
     .then((card) => {
       res.status(201).send(card);
     })
@@ -26,11 +29,14 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
+  const owner = req.user._id;
   Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
-
-    .then(() => {
+    .then((card) => {
+      if (owner === card.owner.toString()) {
+        res.status(500).send({ message: 'Вы не владелец карточки' });
+      }
       Card.deleteOne({ _id: cardId })
-      // res.status(200).send(card);
+      // res.status(200).send(`${owner} ${card.owner}`);
         .then((deletedCard) => {
           res.status(200).send(deletedCard);
         });
