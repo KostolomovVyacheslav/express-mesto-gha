@@ -18,6 +18,18 @@ const getUsers = (req, res) => {
     });
 };
 
+const getSelfInfo = (req, res) => {
+  // const userId = req.user._id;
+  // console.log(req.params);
+  User.findById(req.user._id)
+    .then((user) => {
+      res.status(200).send({ user });
+    })
+    .catch((err) => {
+      res.status(400).send({ message: 'ошибка ошибка', err });
+    });
+};
+
 const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
@@ -29,7 +41,7 @@ const getUserById = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      // if (err instanceof mongoose.Error.CastError) {
+      // if (err instanceof mongoose.Error.CastError) {ККК
       if (err.message === 'CastError') {
         throw new BadRequest('Переданы некорректные данные');
       } else if (err.message === 'Not Found') {
@@ -37,29 +49,8 @@ const getUserById = (req, res, next) => {
       } else {
         next(err);
       }
-      // return res.status(500).send({ message: 'На сервере произошла ошибка', err });
+    // return res.status(500).send({ message: 'На сервере произошла ошибка', err });ККК
     });
-};
-
-const getSelfInfo = (req, res) => {
-  // const userId = req.user._id;
-  // console.log(req.params);
-  User.findById(req.user._id)
-    .then((user) => {
-      res.status(200).send({ user });
-    })
-    .catch((err) => {
-      res.status(500).send({ message: 'ошибка ошибка', err });
-    });
-  // console.log(req.user._id);
-  // const { userId } = req.params;
-  // User.findById(userId)
-  //   .then((user) => {
-  //     res.status(200).send(user);
-  //   })
-  //   .catch((err) => {
-  //     res.status(404).send({ message: 'ошибка в поиске', err });
-  //   });
 };
 
 // const getUserById = (req, res) => {
@@ -178,11 +169,16 @@ const login = (req, res) => {
       // res.status(200).send(user);
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret',
         { expiresIn: '7d' },
       );
-      // const token = jwt.sign({ _id: user._id }, 'some-secret-key');
-      res.send({ token });
+      // const token = jwt.sign({ _id: user._id }, 'some-secret-key');КК
+      // res.send({ token });
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        sameSite: true,
+        maxAge: 3600000 * 24,
+      }).send({ token });
     })
     .catch((err) => {
       res

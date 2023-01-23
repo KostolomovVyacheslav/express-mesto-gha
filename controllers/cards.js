@@ -30,6 +30,7 @@ const deleteCard = (req, res) => {
 
     .then(() => {
       Card.deleteOne({ _id: cardId })
+      // res.status(200).send(card);
         .then((deletedCard) => {
           res.status(200).send(deletedCard);
         });
