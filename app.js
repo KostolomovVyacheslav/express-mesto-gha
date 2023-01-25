@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 // const { celebrate, Joi } = require('celebrate');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -39,6 +40,8 @@ app.use((req, res) => {
     message: 'Веб-страница ищет HTML своей жизни. Желательно без ошибок и вредных привычек :)',
   });
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
