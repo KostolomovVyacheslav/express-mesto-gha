@@ -4,8 +4,8 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
-// const { celebrate, Joi } = require('celebrate');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
@@ -27,7 +27,15 @@ app.use(helmet());
 
 app.use(express.json());
 
-app.post('/signup', createUser);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
+
 app.post('/signin', login);
 
 app.use(auth);
