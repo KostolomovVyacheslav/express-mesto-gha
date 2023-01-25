@@ -161,7 +161,7 @@ const avatarUpdate = async (req, res) => {
 // return res.status(200).send({ message: 'Hello from auth' });
 // };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -169,7 +169,7 @@ const login = (req, res) => {
       // res.status(200).send(user);
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
+        `${NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key'}`,
         { expiresIn: '7d' },
       );
       // const token = jwt.sign({ _id: user._id }, 'some-secret-key');КК
@@ -180,11 +180,12 @@ const login = (req, res) => {
       //   maxAge: 3600000 * 24,
       // }).send({ token });
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    // .catch((err) => {
+    //   res
+    //     .status(401)
+    //     .send({ message: err.message });
+    // });
+    .catch(next);
 };
 
 // User.findOne({ email })
