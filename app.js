@@ -6,6 +6,8 @@ const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
+const isUrl = require('validator/lib/isURL');
+const BadRequest = require('./errors/bad-request-err');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
@@ -31,6 +33,12 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom((link) => {
+      if (isUrl(link, { require_protocol: true })) {
+        return link;
+      }
+      throw new BadRequest('Плохая ссылка / URL');
+    }),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
