@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const isUrl = require('validator/lib/isURL');
+const BadRequest = require('../errors/bad-request-err');
 const {
   getUsers, getSelfInfo, getUserById, profileUpdate, avatarUpdate,
 } = require('../controllers/users');
@@ -21,7 +23,12 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string().required().custom((link) => {
+      if (isUrl(link, { require_protocol: true })) {
+        return link;
+      }
+      throw new BadRequest('Плохая ссылка / URL');
+    }),
   }),
 }), avatarUpdate);
 
