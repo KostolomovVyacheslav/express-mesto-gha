@@ -55,22 +55,6 @@ const deleteCard = (req, res) => {
     });
 };
 
-// const deleteCard = (req, res) => {
-//   const cardId = req.params.id;
-
-//   return Card.findById(cardId)
-//     .orFail(() => {
-//       res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
-//     })
-//     .then((card) => {
-//       if (card.owner.toString() === req.user._id) {
-//         Card.findByIdAndRemove(cardId)
-//           .then(() => res.status(200).send(card));
-//       }
-//       res.status(403).send({ message: 'Вы не владелец карточки' });
-//     });
-// };
-
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
