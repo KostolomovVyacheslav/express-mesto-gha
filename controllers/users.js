@@ -120,7 +120,7 @@ const avatarUpdate = async (req, res) => {
     const newAvatar = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true, runValidators: true,
     });
-    return res.status(200).send(newAvatar);
+    return res.status(200).send(newAvatar, req.user.password);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара', err });
