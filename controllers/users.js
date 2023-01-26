@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequest = require('../errors/bad-request-err');
+const Unauthorized = require('../errors/403');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -81,7 +82,14 @@ const createUser = (req, res) => {
       name, about, avatar, email, password: hash,
     }))
     .then((user) => {
-      res.status(201).send({ data: { name: user.name, avatar: user.avatar, email: user.email } });
+      res.status(201).send({
+        data: {
+          name: user.name,
+          avatar: user.avatar,
+          email: user.email,
+          password: user.password,
+        },
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -163,6 +171,9 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
+    .orFail(() => {
+      throw new Unauthorized('403 ошибка кажется');
+    })
     .then((user) => {
       // res.status(200).send(user);
       const token = jwt.sign(
