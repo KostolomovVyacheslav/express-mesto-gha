@@ -80,10 +80,8 @@ const createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-
     .then((user) => {
-      res.status(201).send(user);
-      // res.status(201).send({ user });
+      res.status(201).send({ data: { name: user.name, avatar: user.avatar, email: user.email } });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
