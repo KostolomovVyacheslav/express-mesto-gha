@@ -22,8 +22,7 @@ const getSelfInfo = (req, res) => {
   // console.log(req.params);
   User.findById(req.user._id)
     .then((user) => {
-      res.status(200).send({ user, password: user.password });
-      // res.status(200).send({ password: user.password });
+      res.status(200).send({ user });
     })
     .catch((err) => {
       res.status(400).send({ message: 'ошибка ошибка', err });
@@ -165,7 +164,7 @@ const avatarUpdate = async (req, res) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password).select('+password')
     .then((user) => {
       // res.status(200).send(user);
       const token = jwt.sign(
