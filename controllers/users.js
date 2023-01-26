@@ -82,7 +82,7 @@ const createUser = (req, res) => {
     }))
 
     .then((user) => {
-      res.status(201).send({ data: user });
+      res.status(201).send(user);
       // res.status(201).send({ user });
     })
     .catch((err) => {
