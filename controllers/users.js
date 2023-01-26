@@ -22,7 +22,8 @@ const getSelfInfo = (req, res) => {
   // console.log(req.params);
   User.findById(req.user._id)
     .then((user) => {
-      res.status(200).send({ user });
+      res.status(200).send({ user, password: user.password });
+      // res.status(200).send({ password: user.password });
     })
     .catch((err) => {
       res.status(400).send({ message: 'ошибка ошибка', err });
@@ -82,7 +83,7 @@ const createUser = (req, res) => {
     }))
 
     .then((user) => {
-      res.status(201).send({ data: user, password });
+      res.status(201).send({ data: user });
       // res.status(201).send({ user });
     })
     .catch((err) => {
