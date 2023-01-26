@@ -88,7 +88,6 @@ const createUser = (req, res) => {
           about: user.about,
           avatar: user.avatar,
           email: user.email,
-          password: req.body.password,
         },
       });
     })
