@@ -38,12 +38,12 @@ const deleteCard = (req, res, next) => {
   if (!cardId) {
     throw new BadRequest('Переданы некорректные данные');
   }
-  // const owner = req.user._id;
+  const owner = req.user._id;
   Card.findById({ _id: cardId }).orFail(() => {
     throw new NotFoundError('Карточка с указанным _id не найдена');
   })
     .then((card) => {
-      if (req.user._id !== card.owner.toString()) {
+      if (owner !== card.owner.toString()) {
         throw new ForbiddenError('В доступе отказано');
       }
       Card.deleteOne({ _id: cardId })
@@ -73,10 +73,10 @@ const likeCard = (req, res, next) => {
   })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
+      if (err.name === 'CastError') {
         throw new BadRequest('Не корректный _id', err);
-      } else if (err.name === 'NotFound') {
-        throw new NotFoundError('Передан несуществующий _id карточки');
+      } else if (err.name === 'NotFoundError') {
+        throw new NotFoundError('Карточка с указанным _id не найдена');
       } else {
         throw new ServerError('На сервере произошла ошибка', err);
       }
