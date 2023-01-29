@@ -39,10 +39,11 @@ const deleteCard = (req, res, next) => {
     throw new BadRequest('Переданы некорректные данные');
   }
   const owner = req.user._id;
-  Card.findById({ _id: cardId }).orFail(() => {
-    throw new NotFoundError('Карточка с указанным _id не найдена');
-  })
+  Card.findById({ _id: cardId })
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Карточка с указанным _id не найдена');
+      }
       if (owner !== card.owner.toString()) {
         throw new ForbiddenError('В доступе отказано');
       }
@@ -52,9 +53,7 @@ const deleteCard = (req, res, next) => {
         });
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
-        throw new NotFoundError('Карточка с указанным _id не найдена', err);
-      } else if (err instanceof mongoose.Error.CastError) {
+      if (err instanceof mongoose.Error.CastError) {
         throw new BadRequest('Не корректный _id', err);
       } else {
         throw new ServerError('На сервере произошла ошибка', err);
@@ -70,18 +69,11 @@ const likeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (card) {
-        res.send(card);
+      if (!card) {
+        throw new NotFoundError('Карточка с указанным _id не найдена');
       }
-      throw new NotFoundError('Карточка с указанным _id не найдена');
+      res.send(card);
     })
-    // .catch((err) => {
-    //   if (err.name === 'CastError') {
-    //     throw new BadRequest('Не корректный _id', err);
-    //   } else if (err.name === 'NotFound') {
-    //     throw new NotFoundError('Карточка с указанным _id не найдена');
-    //   }
-    // })
     .catch(next);
 };
 
