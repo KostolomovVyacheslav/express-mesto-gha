@@ -36,15 +36,14 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   if (!cardId) {
-    // res.status(403).send({ message: 'Не правильный id' });
     throw new BadRequest('Переданы некорректные данные');
   }
-  const owner = req.user._id;
+  // const owner = req.user._id;
   Card.findById({ _id: cardId }).orFail(() => {
     throw new NotFoundError('Карточка с указанным _id не найдена');
   })
     .then((card) => {
-      if (owner !== card.owner.toString()) {
+      if (req.user._id !== card.owner.toString()) {
         throw new ForbiddenError('В доступе отказано');
       }
       Card.deleteOne({ _id: cardId })
