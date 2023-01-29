@@ -9,24 +9,26 @@ const ServerError = require('../errors/500-Internal-server-error');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.status(200).send(users);
     })
     .catch(() => {
       throw new ServerError('На сервере произошла ошибка');
-    });
+    })
+    .catch(next);
 };
 
-const getSelfInfo = (req, res) => {
+const getSelfInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       res.status(200).send({ user });
     })
     .catch(() => {
       throw new BadRequest('Переданы некорректные данные');
-    });
+    })
+    .catch(next);
 };
 
 const getUserById = (req, res, next) => {
@@ -50,7 +52,7 @@ const getUserById = (req, res, next) => {
 };
 
 // eslint-disable-next-line consistent-return
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -76,10 +78,11 @@ const createUser = (req, res) => {
         throw new BadRequest('Переданы некорректные данные при создании пользователя');
       }
       throw new ServerError('На сервере произошла ошибка');
-    });
+    })
+    .catch(next);
 };
 
-const profileUpdate = (req, res) => {
+const profileUpdate = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -99,7 +102,8 @@ const profileUpdate = (req, res) => {
         throw new BadRequest('Переданы некорректные данные при обновлении профиля');
       }
       throw new ServerError('На сервере произошла ошибка');
-    });
+    })
+    .catch(next);
 };
 
 const avatarUpdate = async (req, res) => {
