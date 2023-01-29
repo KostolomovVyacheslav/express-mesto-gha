@@ -70,16 +70,18 @@ const likeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Карточка с указанным _id не найдена');
+      if (card) {
+        res.send(card);
       }
-      res.send(card);
+      throw new NotFoundError('Карточка с указанным _id не найдена');
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequest('Не корректный _id', err);
-      }
-    })
+    // .catch((err) => {
+    //   if (err.name === 'CastError') {
+    //     throw new BadRequest('Не корректный _id', err);
+    //   } else if (err.name === 'NotFound') {
+    //     throw new NotFoundError('Карточка с указанным _id не найдена');
+    //   }
+    // })
     .catch(next);
 };
 
