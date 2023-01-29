@@ -3,7 +3,7 @@ const Card = require('../models/card');
 const NotFoundError = require('../errors/404-NotFoundError');
 const BadRequest = require('../errors/400-BadRequestError');
 const ServerError = require('../errors/500-ServerError');
-const ForbiddenError = require('../errors/401-AuthError');
+const ForbiddenError = require('../errors/401-UnauthorizedError');
 
 const getCards = (req, res, next) => {
   Card.find({})

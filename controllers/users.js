@@ -5,7 +5,8 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/404-NotFoundError');
 const BadRequest = require('../errors/400-BadRequestError');
 const ServerError = require('../errors/500-ServerError');
-// const Unauthorized = require('../errors/403');
+const ConflictError = require('../errors/409-ConflictError');
+const UnauthorizedError = require('../errors/401-UnauthorizedError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -76,8 +77,11 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequest('Переданы некорректные данные при создании пользователя');
+      } else if (err.code === 11000) {
+        throw new ConflictError('Данный адрес электронной почти уже используется');
+      } else {
+        next(err);
       }
-      throw new ServerError('На сервере произошла ошибка');
     })
     .catch(next);
 };
