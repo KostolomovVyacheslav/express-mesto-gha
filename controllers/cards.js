@@ -44,22 +44,22 @@ const deleteCard = (req, res, next) => {
     throw new NotFoundError('Карточка с указанным _id не найдена');
   })
     .then((card) => {
-      if (owner === card.owner.toString()) {
-        Card.deleteOne({ _id: cardId })
-          .then((deletedCard) => {
-            res.status(200).send(deletedCard);
-          });
+      if (owner !== card.owner.toString()) {
+        throw new ForbiddenError('В доступе отказано');
       }
+      Card.deleteOne({ _id: cardId })
+        .then((deletedCard) => {
+          res.status(200).send(deletedCard);
+        });
     })
-    .catch(() => {
-      throw new ForbiddenError('В доступе отказано');
-      // if (err.message === 'Not Found') {
-      //   throw new NotFoundError('Карточка с указанным _id не найдена', err);
-      // }
-      // if (err instanceof mongoose.Error.CastError) {
-      //   throw new BadRequest('Не корректный _id', err);
-      // }
-      // throw new ServerError('На сервере произошла ошибка', err);
+    .catch((err) => {
+      if (err.message === 'Not Found') {
+        throw new NotFoundError('Карточка с указанным _id не найдена', err);
+      } else if (err instanceof mongoose.Error.CastError) {
+        throw new BadRequest('Не корректный _id', err);
+      } else {
+        throw new ServerError('На сервере произошла ошибка', err);
+      }
     })
     .catch((err) => next(err));
 };
