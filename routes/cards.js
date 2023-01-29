@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const isUrl = require('validator/lib/isURL');
 const { celebrate, Joi } = require('celebrate');
-const BadRequest = require('../errors/bad-request-err');
+const BadRequest = require('../errors/400-bad-request-err');
 const {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');

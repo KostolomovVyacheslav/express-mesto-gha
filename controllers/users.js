@@ -2,8 +2,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const NotFoundError = require('../errors/not-found-error');
-const BadRequest = require('../errors/bad-request-err');
+const NotFoundError = require('../errors/404-not-found-error');
+const BadRequest = require('../errors/400-bad-request-err');
 // const Unauthorized = require('../errors/403');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -19,14 +19,12 @@ const getUsers = (req, res) => {
 };
 
 const getSelfInfo = (req, res) => {
-  // const userId = req.user._id;
-  // console.log(req.params);
   User.findById(req.user._id)
     .then((user) => {
       res.status(200).send({ user });
     })
-    .catch((err) => {
-      res.status(400).send({ message: 'ошибка ошибка', err });
+    .catch(() => {
+      throw new BadRequest('Переданы некорректные данные');
     });
 };
 
@@ -34,22 +32,20 @@ const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail(() => {
-      throw new NotFoundError('Пользователь по указанному id не найден, такие дела делишки');
+      throw new NotFoundError('Пользователь по указанному id не найден');
     })
 
     .then((user) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      // if (err instanceof mongoose.Error.CastError) {ККК
       if (err.message === 'CastError') {
         throw new BadRequest('Переданы некорректные данные');
       } else if (err.message === 'Not Found') {
-        throw new NotFoundError('Пользователь по указанному id не найден, такие дела делишки');
+        throw new NotFoundError('Пользователь по указанному id не найден');
       } else {
         next(err);
       }
-    // return res.status(500).send({ message: 'На сервере произошла ошибка', err });ККК
     });
 };
 

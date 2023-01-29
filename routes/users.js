@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const isUrl = require('validator/lib/isURL');
-const BadRequest = require('../errors/bad-request-err');
+const BadRequest = require('../errors/400-bad-request-err');
 const {
   getUsers, getSelfInfo, getUserById, profileUpdate, avatarUpdate,
 } = require('../controllers/users');
