@@ -6,7 +6,6 @@ const NotFoundError = require('../errors/404-NotFoundError');
 const BadRequest = require('../errors/400-BadRequestError');
 const ServerError = require('../errors/500-ServerError');
 const ConflictError = require('../errors/409-ConflictError');
-const UnauthorizedError = require('../errors/401-UnauthorizedError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
