@@ -34,9 +34,7 @@ const getSelfInfo = (req, res, next) => {
 const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(() => {
-      throw new NotFoundError('Пользователь по указанному id не найден');
-    })
+    .orFail(new Error('Not Found'))
     .then((user) => {
       res.status(200).send(user);
     })
