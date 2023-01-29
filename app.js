@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const isUrl = require('validator/lib/isURL');
-const BadRequest = require('./errors/400-bad-request-err');
+const BadRequest = require('./errors/400-BadRequestError');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
