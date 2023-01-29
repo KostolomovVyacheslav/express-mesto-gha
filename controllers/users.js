@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/404-not-found-error');
 const BadRequest = require('../errors/400-bad-request-err');
+const ServerError = require('../errors/500-Internal-server-error');
 // const Unauthorized = require('../errors/403');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -13,8 +14,8 @@ const getUsers = (req, res) => {
     .then((users) => {
       res.status(200).send(users);
     })
-    .catch((err) => {
-      res.status(500).send({ message: 'На сервере произошла ошибка', err });
+    .catch(() => {
+      throw new ServerError('На сервере произошла ошибка');
     });
 };
 
@@ -34,7 +35,6 @@ const getUserById = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError('Пользователь по указанному id не найден');
     })
-
     .then((user) => {
       res.status(200).send(user);
     })
@@ -49,30 +49,14 @@ const getUserById = (req, res, next) => {
     });
 };
 
-// const getUserById = (req, res) => {
-//   const { userId } = req.params;
-//   User.findById(userId).orFail(new Error('Not Found'))
-
-//     .then((user) => {
-//       res.status(200).send(user);
-//     })
-//     .catch((err) => {
-//       if (err.message === 'Not Found') {
-//         return res.status(404).send({ message: 'Пользователь с указанным _id не найден', err });
-//       }
-//       if (err instanceof mongoose.Error.CastError) {
-//         return res.status(400).send({ message: 'Не корректный _id', err });
-//       }
-//       return res.status(500).send({ message: 'На сервере произошла ошибка', err });
-//     });
-// };
-
 // eslint-disable-next-line consistent-return
 const createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!email || !password) { return res.status(400).send({ message: 'Некорректные данные' }); }
+  if (!email || !password) {
+    throw new BadRequest('Переданы некорректные данные');
+  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -87,21 +71,11 @@ const createUser = (req, res) => {
         },
       });
     })
-    //   .then((user) => {
-    //     res.status(201).send({
-    //       data: {
-    //         name: user.name,
-    //         avatar: user.avatar,
-    //         email: user.email,
-    //         password: req.body.password,
-    //       },
-    //     });
-    // })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя', err });
+        throw new BadRequest('Переданы некорректные данные при создании пользователя');
       }
-      return res.status(500).send({ message: 'На сервере произошла ошибка', err });
+      throw new ServerError('На сервере произошла ошибка');
     });
 };
 
@@ -111,19 +85,20 @@ const profileUpdate = (req, res) => {
     req.user._id,
     { name, about },
     { new: true, runValidators: true },
-  ).orFail(new Error('Not Found'))
-
+  ).orFail(() => {
+    throw new NotFoundError('Пользователь по указанному id не найден');
+  })
     .then((user) => {
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
-        return res.status(404).send({ message: 'Пользователь с указанным _id не найден', err });
+        throw new NotFoundError('Пользователь с указанным _id не найден');
       }
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля', err });
+        throw new BadRequest('Переданы некорректные данные при обновлении профиля');
       }
-      return res.status(500).send({ message: 'На сервере произошла ошибка', err });
+      throw new ServerError('На сервере произошла ошибка');
     });
 };
 
@@ -135,9 +110,9 @@ const avatarUpdate = async (req, res) => {
     return res.status(200).send(newAvatar);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара', err });
+      throw new BadRequest('Переданы некорректные данные при обновлении аватара');
     }
-    return res.status(500).send({ message: 'На сервере произошла ошибка', err });
+    throw new ServerError('На сервере произошла ошибка');
   }
 };
 
