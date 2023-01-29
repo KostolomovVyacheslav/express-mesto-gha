@@ -67,12 +67,11 @@ const likeCard = (req, res, next) => {
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(new Error('Not Found'))
+  ).orFail(() => {
+    throw new NotFoundError('Карточка с указанным _id не найдена');
+  })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.message === 'Not Found') {
-        throw new NotFoundError('Карточка с указанным _id не найдена', err);
-      }
       if (err instanceof mongoose.Error.CastError) {
         throw new BadRequest('Не корректный _id', err);
       }
