@@ -75,6 +75,11 @@ const likeCard = (req, res, next) => {
       }
       res.send(card);
     })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequest('Не корректный _id', err);
+      }
+    })
     .catch(next);
 };
 
