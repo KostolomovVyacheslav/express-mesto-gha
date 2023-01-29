@@ -40,24 +40,26 @@ const deleteCard = (req, res, next) => {
     throw new BadRequest('Переданы некорректные данные');
   }
   const owner = req.user._id;
-  Card.findById({ _id: cardId }).orFail(new Error('Not Found'))
+  Card.findById({ _id: cardId }).orFail(() => {
+    throw new NotFoundError('Карточка с указанным _id не найдена');
+  })
     .then((card) => {
-      if (owner !== card.owner.toString()) {
-        throw new ForbiddenError('В доступе отказано');
+      if (owner === card.owner.toString()) {
+        Card.deleteOne({ _id: cardId })
+          .then((deletedCard) => {
+            res.status(200).send(deletedCard);
+          });
       }
-      Card.deleteOne({ _id: cardId })
-        .then((deletedCard) => {
-          res.status(200).send(deletedCard);
-        });
     })
-    .catch((err) => {
-      if (err.message === 'Not Found') {
-        throw new NotFoundError('Карточка с указанным _id не найдена', err);
-      }
-      if (err instanceof mongoose.Error.CastError) {
-        throw new BadRequest('Не корректный _id', err);
-      }
-      throw new ServerError('На сервере произошла ошибка', err);
+    .catch(() => {
+      throw new ForbiddenError('В доступе отказано');
+      // if (err.message === 'Not Found') {
+      //   throw new NotFoundError('Карточка с указанным _id не найдена', err);
+      // }
+      // if (err instanceof mongoose.Error.CastError) {
+      //   throw new BadRequest('Не корректный _id', err);
+      // }
+      // throw new ServerError('На сервере произошла ошибка', err);
     })
     .catch((err) => next(err));
 };
@@ -74,8 +76,11 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         throw new BadRequest('Не корректный _id', err);
+      } else if (err.name === 'NotFound') {
+        throw new NotFoundError('Передан несуществующий _id карточки');
+      } else {
+        throw new ServerError('На сервере произошла ошибка', err);
       }
-      throw new ServerError('На сервере произошла ошибка', err);
     })
     .catch((err) => next(err));
 };
