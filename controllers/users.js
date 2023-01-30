@@ -1,4 +1,3 @@
-// const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -51,7 +50,6 @@ const getUserById = (req, res, next) => {
     });
 };
 
-// eslint-disable-next-line consistent-return
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -77,7 +75,7 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequest('Переданы некорректные данные при создании пользователя');
       } else if (err.code === 11000) {
-        throw new ConflictError('Данный адрес электронной почти уже используется');
+        throw new ConflictError('Данный адрес электронной почты уже используется');
       } else {
         next(err);
       }
@@ -99,7 +97,7 @@ const profileUpdate = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
-        throw new NotFoundError('Пользователь с указанным _id не найден');
+        throw new NotFoundError('Пользователь с указанным id не найден');
       }
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         throw new BadRequest('Переданы некорректные данные при обновлении профиля');
@@ -127,28 +125,14 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
-    // .orFail(() => {
-    //   throw new Unauthorized('403 ошибка кажется');
-    // })
     .then((user) => {
-      // res.status(200).send(user);
       const token = jwt.sign(
         { _id: user._id },
         `${NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key'}`,
         { expiresIn: '7d' },
       );
-      // res.send({ token });
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        sameSite: true,
-        maxAge: 3600000 * 24,
-      }).send({ token });
+      res.send({ token });
     })
-    // .catch((err) => {
-    //   res
-    //     .status(401)
-    //     .send({ message: err.message });
-    // });
     .catch(next);
 };
 

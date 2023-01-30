@@ -29,7 +29,7 @@ router.patch('/me/avatar', celebrate({
       if (isUrl(link, { require_protocol: true })) {
         return link;
       }
-      throw new BadRequest('Плохая ссылка / URL');
+      throw new BadRequest('Некорректный адрес URL');
     }),
   }),
 }), avatarUpdate);

@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
@@ -23,7 +22,6 @@ const limiter = rateLimit({
   message: 'Слишком много запросов, пожалуйста попробуйте позже :)',
 });
 
-app.use(cookieParser());
 app.use(limiter);
 app.use(helmet());
 
@@ -37,7 +35,7 @@ app.post('/signup', celebrate({
       if (isUrl(link, { require_protocol: true })) {
         return link;
       }
-      throw new BadRequest('Плохая ссылка / URL');
+      throw new BadRequest('Некорректный адрес URL');
     }),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
