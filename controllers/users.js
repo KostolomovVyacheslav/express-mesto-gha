@@ -123,38 +123,6 @@ const avatarUpdate = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line consistent-return
-// const login = (req, res) => {
-//   const { email, password } = req.body;
-//   if (!email || !password) {
-//     return res.status(400).send({ message: 'Некорректные данные' });
-//   }
-
-//   User.findOne({ email })
-//     .then((user) => {
-//       if (!user) {
-//         return Promise.reject(new Error('Неправильные почта или пароль'));
-//       }
-//       return bcrypt.compare(password, user.password).then((match) => {
-//         console.log(match);
-//         if (!match) {
-//           return res.status(401).send({ message: 'auth NO success' });
-//         }
-//         const result = signToken(user._id);
-//         // console.log(result);
-//         if (!result) {
-//           return res.status(500).send({ message: 'token creation error' });
-//         }
-//         return res.status(200).send({ data: result });
-//       });
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       res.status(401).send({ message: err.message });
-//     });
-// return res.status(200).send({ message: 'Hello from auth' });
-// };
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -169,13 +137,12 @@ const login = (req, res, next) => {
         `${NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key'}`,
         { expiresIn: '7d' },
       );
-      // const token = jwt.sign({ _id: user._id }, 'some-secret-key');КК
-      res.send({ token });
-      // res.cookie('jwt', token, {
-      //   httpOnly: true,
-      //   sameSite: true,
-      //   maxAge: 3600000 * 24,
-      // }).send({ token });
+      // res.send({ token });
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        sameSite: true,
+        maxAge: 3600000 * 24,
+      }).send({ token });
     })
     // .catch((err) => {
     //   res
@@ -184,24 +151,6 @@ const login = (req, res, next) => {
     // });
     .catch(next);
 };
-
-// User.findOne({ email })
-//   .then((user) => {
-//     if (!user) {
-//       return Promise.reject(new Error('Неправильные почта или пароль'));
-//     }
-//     return bcrypt.compare(password, user.password);
-//   })
-//   .then((matched) => {
-//     if (!matched) {
-//       return Promise.reject(new Error('Неправильные почта или пароль'));
-//     }
-//     return res.send({ message: 'Всё верно!' });
-//   })
-//   .catch((err) => {
-//     res.status(401).send({ message: err.massege });
-//   });
-// };
 
 module.exports = {
   getUsers,
