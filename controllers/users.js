@@ -122,6 +122,19 @@ const avatarUpdate = async (req, res) => {
 };
 
 const login = (req, res, next) => {
+  // const { email, password } = req.body;
+
+  // return User.findUserByCredentials(email, password)
+  //   .then((user) => {
+  //     const token = jwt.sign(
+  //       { _id: user._id },
+  //       `${NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key'}`,
+  //       { expiresIn: '7d' },
+  //     );
+  //     res.send({ token });
+  //   })
+  //   .catch(next);
+
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -131,7 +144,11 @@ const login = (req, res, next) => {
         `${NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key'}`,
         { expiresIn: '7d' },
       );
-      res.send({ token });
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        sameSite: true,
+        maxAge: 3600000 * 24,
+      }).send({ token });
     })
     .catch(next);
 };
