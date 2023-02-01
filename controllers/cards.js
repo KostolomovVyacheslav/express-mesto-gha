@@ -70,7 +70,7 @@ const likeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Переданы некорректные данные'));
+        throw new BadRequest('Переданы некорректные данные');
       }
     })
     .catch(next);
