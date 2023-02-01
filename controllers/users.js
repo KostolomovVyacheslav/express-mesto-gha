@@ -34,7 +34,7 @@ const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail(() => {
-      throw new NotFoundError('Пользователь по указанному id не найден');
+      next(new NotFoundError('Пользователь по указанному id не найден'));
     })
     .then((user) => {
       res.status(200).send(user);
@@ -52,9 +52,6 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!email || !password) {
-    throw new BadRequest('Переданы некорректные данные');
-  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -71,14 +68,13 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при создании пользователя');
+        next(new BadRequest('Переданы некорректные данные при создании пользователя'));
       } else if (err.code === 11000) {
-        throw new ConflictError('Данный адрес электронной почты уже используется');
+        next(new ConflictError('Данный адрес электронной почты уже используется'));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const profileUpdate = (req, res, next) => {
@@ -94,15 +90,12 @@ const profileUpdate = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
-        throw new NotFoundError('Пользователь с указанным id не найден');
-      }
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные при обновлении профиля');
+        next(new BadRequest('Переданы некорректные данные при обновлении профиля'));
+      } else {
+        next(new ServerError('На сервере произошла ошибка'));
       }
-      throw new ServerError('На сервере произошла ошибка');
-    })
-    .catch(next);
+    });
 };
 
 const avatarUpdate = async (req, res, next) => {
