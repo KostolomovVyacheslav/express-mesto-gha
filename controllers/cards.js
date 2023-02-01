@@ -72,7 +72,8 @@ const likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
       }
-    });
+    })
+    .catch(next);
 };
 
 const dislikeCard = (req, res, next) => {
