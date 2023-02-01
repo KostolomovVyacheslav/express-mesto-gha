@@ -9,6 +9,7 @@ const isUrl = require('validator/lib/isURL');
 const BadRequest = require('./errors/400-BadRequestError');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const handleError = require('./middlewares/handleError');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 
@@ -63,18 +64,7 @@ app.use((req, res) => {
 
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-});
+app.use(handleError);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
