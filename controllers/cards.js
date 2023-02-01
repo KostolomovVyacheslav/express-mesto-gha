@@ -41,13 +41,13 @@ const deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (currentUser === card.owner.toString()) {
-        return Card.deleteOne({ _id: cardId })
+        Card.deleteOne({ _id: cardId })
           .then(() => {
             res.status(200).send(card);
           })
           .catch(next);
       }
-      throw new ForbiddenError('В доступе отказано');
+      next(new ForbiddenError('В доступе отказано'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
