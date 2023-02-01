@@ -45,7 +45,7 @@ const deleteCard = (req, res, next) => {
           .then(() => {
             res.status(200).send(card);
           })
-          // .catch(next);
+          .catch(next);
       } else {
         next(new ForbiddenError('В доступе отказано'));
       }
