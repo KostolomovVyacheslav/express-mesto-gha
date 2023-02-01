@@ -14,20 +14,25 @@ const getUsers = (req, res, next) => {
       res.status(200).send(users);
     })
     .catch(() => {
-      throw new ServerError('На сервере произошла ошибка');
-    })
-    .catch(next);
+      next(new ServerError('На сервере произошла ошибка'));
+    });
 };
 
 const getSelfInfo = (req, res, next) => {
   User.findById(req.user._id)
+    .orFail(() => {
+      next(new NotFoundError('Пользователь не найден'));
+    })
     .then((user) => {
       res.status(200).send({ user });
     })
-    .catch(() => {
-      throw new BadRequest('Переданы некорректные данные');
-    })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(new ServerError('На сервере произошла ошибка'));
+      }
+    });
 };
 
 const getUserById = (req, res, next) => {
@@ -84,7 +89,7 @@ const profileUpdate = (req, res, next) => {
     { name, about },
     { new: true, runValidators: true },
   ).orFail(() => {
-    throw new NotFoundError('Пользователь по указанному id не найден');
+    next(new NotFoundError('Пользователь по указанному id не найден'));
   })
     .then((user) => {
       res.status(200).send(user);
