@@ -81,7 +81,7 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   ).orFail(() => {
-    throw new NotFoundError('Карточка с указанным _id не найдена');
+    next(new NotFoundError('Карточка с указанным _id не найдена'));
   })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
