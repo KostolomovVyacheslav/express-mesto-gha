@@ -37,7 +37,7 @@ const deleteCard = (req, res, next) => {
   const currentUser = req.user._id;
   Card.findById({ _id: cardId })
     .orFail(() => {
-      throw new NotFoundError('Карточка с указанным _id не найдена');
+      next(new NotFoundError('Карточка с указанным _id не найдена'));
     })
     .then((card) => {
       if (currentUser === card.owner.toString()) {
@@ -53,8 +53,7 @@ const deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные для удаления карточки'));
       }
-    })
-    .catch(next);
+    });
 };
 
 const likeCard = (req, res, next) => {
