@@ -34,9 +34,6 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!cardId) {
-    throw new BadRequest('Переданы некорректные данные');
-  }
   const currentUser = req.user._id;
   Card.findById({ _id: cardId })
     .orFail(() => {
@@ -52,7 +49,11 @@ const deleteCard = (req, res, next) => {
       }
       throw new ForbiddenError('В доступе отказано');
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные для удаления карточки'));
+      }
+    });
 };
 
 const likeCard = (req, res, next) => {
@@ -67,7 +68,11 @@ const likeCard = (req, res, next) => {
       }
       res.send(card);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      }
+    });
 };
 
 const dislikeCard = (req, res, next) => {
