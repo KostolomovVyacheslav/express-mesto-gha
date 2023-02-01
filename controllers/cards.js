@@ -46,8 +46,9 @@ const deleteCard = (req, res, next) => {
             res.status(200).send(card);
           })
           .catch(next);
+      } else {
+        next(new ForbiddenError('В доступе отказано'));
       }
-      next(new ForbiddenError('В доступе отказано'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
