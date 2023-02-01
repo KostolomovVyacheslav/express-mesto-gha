@@ -10,10 +10,9 @@ const getCards = (req, res, next) => {
     .then((cards) => {
       res.status(200).send(cards);
     })
-    .catch((err) => {
-      throw new ServerError('На сервере произошла ошибка', err);
-    })
-    .catch((err) => next(err));
+    .catch(() => {
+      next(new ServerError('На сервере произошла ошибка'));
+    });
 };
 
 const createCard = (req, res, next) => {
@@ -26,11 +25,11 @@ const createCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при создании карточки', err);
+        next(new BadRequest('Переданы некорректные данные при создании карточки'));
+      } else {
+        throw new ServerError('На сервере произошла ошибка', err);
       }
-      throw new ServerError('На сервере произошла ошибка', err);
-    })
-    .catch((err) => next(err));
+    });
 };
 
 const deleteCard = (req, res, next) => {
