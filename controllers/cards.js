@@ -53,7 +53,8 @@ const deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные для удаления карточки'));
       }
-    });
+    })
+    .catch(next);
 };
 
 const likeCard = (req, res, next) => {
@@ -68,11 +69,11 @@ const likeCard = (req, res, next) => {
       }
       res.send(card);
     })
-    // .catch((err) => {
-    //   if (err.name === 'CastError') {
-    //     next(new BadRequest('Переданы некорректные данные'));
-    //   }
-    // })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      }
+    })
     .catch(next);
 };
 
