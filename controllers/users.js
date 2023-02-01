@@ -41,11 +41,9 @@ const getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные');
-      } else if (err.message === 'Not Found') {
-        throw new NotFoundError('Пользователь по указанному id не найден');
+        next(new BadRequest('Переданы некорректные данные'));
       } else {
-        next(err);
+        next(new ServerError('На сервере произошла ошибка'));
       }
     });
 };
@@ -107,17 +105,18 @@ const profileUpdate = (req, res, next) => {
     .catch(next);
 };
 
-const avatarUpdate = async (req, res) => {
+const avatarUpdate = async (req, res, next) => {
   try {
     const newAvatar = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true, runValidators: true,
     });
-    return res.status(200).send(newAvatar);
+    res.status(200).send(newAvatar);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      throw new BadRequest('Переданы некорректные данные при обновлении аватара');
+      next(new BadRequest('Переданы некорректные данные при обновлении аватара'));
+    } else {
+      next(new ServerError('На сервере произошла ошибка'));
     }
-    throw new ServerError('На сервере произошла ошибка');
   }
 };
 
