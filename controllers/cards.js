@@ -63,7 +63,7 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).orFail(() => {
-    throw new NotFoundError('Карточка с указанным _id не найдена');
+    next(new NotFoundError('Карточка с указанным _id не найдена'));
   })
     .then((card) => {
       res.send(card);
@@ -72,8 +72,7 @@ const likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
       }
-    })
-    .next();
+    });
 };
 
 const dislikeCard = (req, res, next) => {
