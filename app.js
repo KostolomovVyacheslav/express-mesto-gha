@@ -56,11 +56,7 @@ app.use(auth);
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
-app.use((req, res) => {
-  res.status(404).json({
-    message: 'Веб-страница ищет HTML своей жизни. Желательно без ошибок и вредных привычек :)',
-  });
-});
+app.use('/', require('./routes/notExist'));
 
 app.use(errors());
 
