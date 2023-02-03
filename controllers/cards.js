@@ -27,7 +27,7 @@ const createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при создании карточки'));
       } else {
-        next(new ServerError('На сервере произошла ошибка', err));
+        next(new ServerError('На сервере произошла ошибка'));
       }
     });
 };
@@ -37,15 +37,14 @@ const deleteCard = (req, res, next) => {
   const currentUser = req.user._id;
   Card.findById({ _id: cardId })
     .orFail(() => {
-      next(new NotFoundError('Карточка с указанным _id не найдена'));
+      throw new NotFoundError('Карточка с указанным _id не найдена');
     })
     .then((card) => {
       if (currentUser === card.owner.toString()) {
         Card.deleteOne({ _id: cardId })
           .then(() => {
             res.status(200).send(card);
-          })
-          .catch(next);
+          });
       } else {
         next(new ForbiddenError('В доступе отказано'));
       }
@@ -53,6 +52,8 @@ const deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные для удаления карточки'));
+      } else {
+        next(new ServerError('На сервере произошла ошибка'));
       }
     });
 };
@@ -63,7 +64,7 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).orFail(() => {
-    next(new NotFoundError('Карточка с указанным _id не найдена'));
+    throw new NotFoundError('Карточка с указанным _id не найдена');
   })
     .then((card) => {
       res.send(card);
@@ -71,6 +72,8 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(new ServerError('На сервере произошла ошибка'));
       }
     });
 };
@@ -81,14 +84,14 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   ).orFail(() => {
-    next(new NotFoundError('Карточка с указанным _id не найдена'));
+    throw new NotFoundError('Карточка с указанным _id не найдена');
   })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequest('Не корректный _id', err));
+        next(new BadRequest('Не корректный _id'));
       } else {
-        next(new ServerError('На сервере произошла ошибка', err));
+        next(new ServerError('На сервере произошла ошибка'));
       }
     });
 };
