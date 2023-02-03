@@ -21,7 +21,7 @@ const getUsers = (req, res, next) => {
 const getSelfInfo = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
-      next(new NotFoundError('Пользователь не найден'));
+      throw new NotFoundError('Пользователь не найден');
     })
     .then((user) => {
       res.status(200).send({ user });
@@ -30,7 +30,8 @@ const getSelfInfo = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
       } else {
-        next(new ServerError('На сервере произошла ошибка'));
+        // next(new ServerError('На сервере произошла ошибка'));
+        next(err);
       }
     });
 };
@@ -39,7 +40,7 @@ const getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail(() => {
-      next(new NotFoundError('Пользователь по указанному id не найден'));
+      throw new NotFoundError('Пользователь по указанному id не найден');
     })
     .then((user) => {
       res.status(200).send(user);
@@ -48,7 +49,8 @@ const getUserById = (req, res, next) => {
       if (err.message === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
       } else {
-        next(new ServerError('На сервере произошла ошибка'));
+        // next(new ServerError('На сервере произошла ошибка'));
+        next(err);
       }
     });
 };
@@ -89,7 +91,7 @@ const profileUpdate = (req, res, next) => {
     { name, about },
     { new: true, runValidators: true },
   ).orFail(() => {
-    next(new NotFoundError('Пользователь по указанному id не найден'));
+    throw new NotFoundError('Пользователь по указанному id не найден');
   })
     .then((user) => {
       res.status(200).send(user);
@@ -98,7 +100,8 @@ const profileUpdate = (req, res, next) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные при обновлении профиля'));
       } else {
-        next(new ServerError('На сервере произошла ошибка'));
+        // next(new ServerError('На сервере произошла ошибка'));
+        next(err);
       }
     });
 };
