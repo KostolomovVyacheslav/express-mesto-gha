@@ -30,7 +30,6 @@ const getSelfInfo = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
       } else {
-        // next(new ServerError('На сервере произошла ошибка'));
         next(err);
       }
     });
@@ -49,7 +48,6 @@ const getUserById = (req, res, next) => {
       if (err.message === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
       } else {
-        // next(new ServerError('На сервере произошла ошибка'));
         next(err);
       }
     });
@@ -100,7 +98,6 @@ const profileUpdate = (req, res, next) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные при обновлении профиля'));
       } else {
-        // next(new ServerError('На сервере произошла ошибка'));
         next(err);
       }
     });

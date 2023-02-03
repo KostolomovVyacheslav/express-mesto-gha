@@ -35,10 +35,9 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const currentUser = req.user._id;
-  Card.findById({ _id: cardId })
-    .orFail(() => {
-      throw new NotFoundError('Карточка с указанным _id не найдена');
-    })
+  Card.findById(
+    { _id: cardId },
+  ).orFail(new Error('Not Found'))
     .then((card) => {
       if (currentUser === card.owner.toString()) {
         Card.deleteOne({ _id: cardId })
@@ -50,7 +49,9 @@ const deleteCard = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'Not Found') {
+        next(new NotFoundError('Карточка с указанным _id не найдена'));
+      } else if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные для удаления карточки'));
       } else {
         next(new ServerError('На сервере произошла ошибка'));
@@ -63,15 +64,15 @@ const likeCard = (req, res, next) => {
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(() => {
-    throw new NotFoundError('Карточка с указанным _id не найдена');
-  })
+  ).orFail(new Error('Not Found'))
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные'));
+      } else if (err.message === 'Not Found') {
+        next(new NotFoundError('Карточка с указанным _id не найдена'));
       } else {
         next(new ServerError('На сервере произошла ошибка'));
       }
@@ -91,7 +92,6 @@ const dislikeCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest('Не корректный _id'));
       } else {
-        // next(new ServerError('На сервере произошла ошибка'));
         next(err);
       }
     });
