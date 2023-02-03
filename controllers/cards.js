@@ -91,7 +91,8 @@ const dislikeCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest('Не корректный _id'));
       } else {
-        next(new ServerError('На сервере произошла ошибка'));
+        // next(new ServerError('На сервере произошла ошибка'));
+        next(err);
       }
     });
 };
